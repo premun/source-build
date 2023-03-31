@@ -22,6 +22,10 @@ parameters:
   displayName: '[⚠️ 8.0] Specific dotnet-dotnet run ID'
   type: string
   default: '200XXXX.Y'
+- name: sbSdkDiffRunID
+  displayName: '[⚠️ 8.0] Specific source-build-sdk-diff-tests run name'
+  type: string
+  default: '200XXXX.Y'
 - name: dotnetInstallerOfficialRunID
   displayName: '[⚠️ 6.0 / 7.0] Specific dotnet-installer-official-ci run ID'
   type: string
@@ -77,6 +81,7 @@ stages:
         releaseBranchName: ${{ parameters.releaseBranchName }}
         useSpecificPipelineRunIDs: ${{ parameters.useSpecificPipelineRunIDs }}
         dotnetDotnetRunID: ${{ parameters.dotnetDotnetRunID }}
+        sbSdkDiffRunID: ${{ parameters.sbSdkDiffRunID }}
         dotnetInstallerOfficialRunID: ${{ parameters.dotnetInstallerOfficialRunID }}
         dotnetInstallerTarballBuildRunID: ${{ parameters.dotnetInstallerTarballBuildRunID }}
         verifyBuildSuccess: ${{ parameters.verifyBuildSuccess }}

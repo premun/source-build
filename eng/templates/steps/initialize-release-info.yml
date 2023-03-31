@@ -17,6 +17,9 @@ parameters:
 - name: dotnetDotnetRunID
   type: string
   default: ''
+- name: sbSdkDiffRunID
+  type: string
+  default: ''
 - name: verifyBuildSuccess
   type: boolean
 - name: useCustomTag
@@ -155,11 +158,14 @@ steps:
     else
       if [[ "${{ parameters.useSpecificPipelineRunIDs }}" == "True" ]]; then
         search_by=name
-        query="${{ parameters.dotnetDotnetRunID }}"
-        echo "Searching for associated build $query"
+        query1="${{ parameters.dotnetDotnetRunID }}"
+        echo "Searching for associated dotnet-dotnet build $query1"
+        query2="${{ parameters.sbSdkDiffRunID }}"
+        echo "Searching for associated source-build-sdk-diff-tests build $query2"
       else
         search_by=tag
-        query="installer-$(ReadReleaseInfo.InstallerCommit)"
+        query1="installer-$(ReadReleaseInfo.InstallerCommit)"
+        query2="$query1"
       fi
 
       get_build_info \
@@ -171,7 +177,19 @@ steps:
         DotnetDotnetCommit \
         "${{ parameters.verifyBuildSuccess }}" \
         $search_by \
-        "$query"
+        "$query1"
+
+      get_build_info \
+        "$(AZDO_ORG)" \
+        "$(AZDO_PROJECT)" \
+        "$(SB_SDK_DIFF_PIPELINE_ID)" \
+        source-build-sdk-diff-tests \
+        SbSdkDiffRunId \
+        SbSdkDiffCommit \
+        "${{ parameters.verifyBuildSuccess }}" \
+        $search_by \
+        "$query2" \
+        || echo "##vso[task.logissue type=warning]Succeeding associated SDK content diff not found"
     fi
   name: AssociatedPipelineRuns
   displayName: Get associated pipeline runs

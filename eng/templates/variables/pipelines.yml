@@ -10,3 +10,5 @@ variables:
   value: 1011
 - name: DOTNET_DOTNET_CI_PIPELINE_ID
   value: 1219
+- name: SB_SDK_DIFF_PIPELINE_ID
+  value: 1231
