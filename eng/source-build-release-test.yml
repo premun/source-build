@@ -1,7 +1,7 @@
 ###
 ### DO NOT MODIFY THIS FILE!
 ###
-### This YAML was auto-generated from SourceBuildReleaseOfficial
+### This YAML was auto-generated from SourceBuildReleaseTest
 ### To make changes, change the C# definition and rebuild its project
 ###
 
@@ -130,7 +130,7 @@ stages:
     useCustomTag: ${{ parameters.useCustomTag }}
     dotnetStagingPipelineResource: dotnet-staging-pipeline-resource
     customTag: ${{ replace(parameters.customTag, ' ', '') }}
-    isDryRun: false
+    isDryRun: true
 
 - stage: MirrorApproval
   displayName: Ready for dotnet-security-partners mirroring
@@ -141,7 +141,7 @@ stages:
     displayName: Ready for dotnet-security-partners mirroring
     pool: server
     environment:
-      name: Source Build Release - Mirror
+      name: pr
 
 - template: templates/stages/mirror.yml
   parameters:
@@ -151,7 +151,7 @@ stages:
     useCustomTag: ${{ parameters.useCustomTag }}
     skipPackageMirroring: ${{ parameters.skipPackageMirroring }}
     dotnetStagingPipelineResource: dotnet-staging-pipeline-resource
-    isDryRun: false
+    isDryRun: true
 
 - stage: NotificationApproval
   displayName: Confirm partner notification sent
@@ -162,7 +162,7 @@ stages:
     displayName: Confirm partner notification sent
     pool: server
     environment:
-      name: Approval - Partner notification
+      name: pr
 
 - stage: ReleaseApproval
   displayName: Confirm Microsoft build released
@@ -173,7 +173,7 @@ stages:
     displayName: Confirm Microsoft build released
     pool: server
     environment:
-      name: Source Build Release - Release
+      name: pr
 
 - template: templates/stages/release.yml
   parameters:
@@ -186,4 +186,4 @@ stages:
     submitReleasePR: ${{ parameters.submitReleasePR }}
     dotnetStagingPipelineResource: dotnet-staging-pipeline-resource
     announcementGist: ${{ replace(parameters.announcementGist, ' ', '') }}
-    isDryRun: false
+    isDryRun: true

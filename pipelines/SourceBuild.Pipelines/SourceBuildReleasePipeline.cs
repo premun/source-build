@@ -6,10 +6,9 @@ using Sharpliner.AzureDevOps;
 
 namespace SourceBuild.Pipelines;
 
-public class SourceBuildRelease : SourceBuildPipelineDefinition
+public abstract class SourceBuildReleasePipeline : PipelineDefinition
 {
     public override TargetPathType TargetPathType => TargetPathType.RelativeToGitRoot;
-    public override string TargetFile => "eng/source-build-release-official.yml";
 
     public override Pipeline Pipeline => new()
     {
@@ -65,8 +64,6 @@ public class SourceBuildRelease : SourceBuildPipelineDefinition
             ReleaseParameters.SubmitReleasePR,
             ReleaseParameters.CreateGitHubRelease,
             ReleaseParameters.SkipPackageMirroring,
-
-            ReleaseParameters.IsDryRun,
         },
 
         Stages =
@@ -84,12 +81,12 @@ public class SourceBuildRelease : SourceBuildPipelineDefinition
                     ReleaseParameters.DotnetInstallerTarballBuildRunID,
                     ReleaseParameters.VerifyBuildSuccess,
                     ReleaseParameters.UseCustomTag,
-                    ReleaseParameters.IsDryRun,
                 },
                 otherParameters: new()
                 {
                     { ReleaseParameters.StagingPipelineResource, ReleaseParameters.StagingPipelineName },
                     { ReleaseParameters.CustomTag.Name, "${{ replace(parameters.customTag, ' ', '') }}" },
+                    { ReleaseParameters.IsDryRun.Name, _isTestPipeline },
                 }),
 
             ApprovalStage(
@@ -106,11 +103,11 @@ public class SourceBuildRelease : SourceBuildPipelineDefinition
                     ReleaseParameters.ReleaseBranchName,
                     ReleaseParameters.UseCustomTag,
                     ReleaseParameters.SkipPackageMirroring,
-                    ReleaseParameters.IsDryRun,
                 },
                 otherParameters: new()
                 {
                     { ReleaseParameters.StagingPipelineResource, ReleaseParameters.StagingPipelineName },
+                    { ReleaseParameters.IsDryRun.Name, _isTestPipeline },
                 }),
 
             ApprovalStage(
@@ -135,13 +132,56 @@ public class SourceBuildRelease : SourceBuildPipelineDefinition
                     ReleaseParameters.CreateReleaseAnnouncement,
                     ReleaseParameters.CreateGitHubRelease,
                     ReleaseParameters.SubmitReleasePR,
-                    ReleaseParameters.IsDryRun,
                 },
                 otherParameters: new()
                 {
                     { ReleaseParameters.StagingPipelineResource, ReleaseParameters.StagingPipelineName },
                     { ReleaseParameters.AnnouncementGist.Name, "${{ replace(parameters.announcementGist, ' ', '') }}" },
+                    { ReleaseParameters.IsDryRun.Name, _isTestPipeline },
                 }),
         }
     };
+
+    #region Helper methods
+
+    private readonly bool _isTestPipeline;
+
+    protected SourceBuildReleasePipeline(bool isTestPipeline)
+    {
+        _isTestPipeline = isTestPipeline;
+    }
+
+    protected Stage ApprovalStage(string name, string environment, string[] dependsOn, string hint) =>
+        new(name, hint)
+        {
+            DependsOn = dependsOn,
+            Jobs =
+            {
+                new DeploymentJob(name, hint)
+                {
+                    // The PR environment doesn't need an actual approval
+                    Environment = _isTestPipeline ? new Sharpliner.AzureDevOps.Environment("pr") : new Sharpliner.AzureDevOps.Environment(environment),
+                    Pool = new ServerPool(),
+                }
+            }
+        };
+
+    protected static Template<Stage> StageTemplate(string path, Parameter[] passThroughParameters, TemplateParameters otherParameters)
+    {
+        var jointParameters = new TemplateParameters();
+
+        foreach (var parameter in passThroughParameters)
+        {
+            jointParameters.Add(parameter.Name, parameters[parameter.Name]);
+        }
+
+        foreach (var parameter in otherParameters)
+        {
+            jointParameters.Add(parameter.Key, parameter.Value);
+        }
+
+        return StageTemplate(path, jointParameters);
+    }
+
+    #endregion
 }
