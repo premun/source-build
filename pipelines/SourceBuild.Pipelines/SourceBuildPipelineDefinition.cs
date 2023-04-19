@@ -2,11 +2,14 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Sharpliner.AzureDevOps;
+using Sharpliner.AzureDevOps.ConditionedExpressions;
 
 namespace SourceBuild.Pipelines;
 
 public abstract class SourceBuildPipelineDefinition : PipelineDefinition
 {
+    #region Helper methods
+
     protected static Stage ApprovalStage(string name, string environment, string[] dependsOn, string hint) =>
         new(name, hint)
         {
@@ -21,13 +24,13 @@ public abstract class SourceBuildPipelineDefinition : PipelineDefinition
             }
         };
 
-    protected static Template<Stage> StageTemplate(string path, string[] passThroughParameters, TemplateParameters otherParameters)
+    protected static Template<Stage> StageTemplate(string path, Parameter[] passThroughParameters, TemplateParameters otherParameters)
     {
         var jointParameters = new TemplateParameters();
 
         foreach (var parameter in passThroughParameters)
         {
-            jointParameters.Add(parameter, parameters[parameter]);
+            jointParameters.Add(parameter.Name, parameters[parameter.Name]);
         }
 
         foreach (var parameter in otherParameters)
@@ -37,4 +40,6 @@ public abstract class SourceBuildPipelineDefinition : PipelineDefinition
 
         return StageTemplate(path, jointParameters);
     }
+
+    #endregion
 }

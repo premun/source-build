@@ -1,7 +1,108 @@
+###
+### DO NOT MODIFY THIS FILE!
+###
+### This YAML was auto-generated from SourceBuildRelease
+### To make changes, change the C# definition and rebuild its project
+###
+
 name: $(Date:yyyyMMdd)$(Rev:.r)
+
 appendCommitMessageToRunName: false
 
+parameters:
+- name: dotnetMajorVersion
+  displayName: Major .NET version being released
+  type: string
+  values:
+  - 6.0
+  - 7.0
+  - 8.0
+
+- name: releaseName
+  displayName: Release name (e.g. ".NET 8.0 Preview 1")
+  type: string
+
+- name: releaseBranchName
+  displayName: Release branch name (e.g. release/8.0.1xx-preview1)
+  type: string
+
+- name: isPreviewRelease
+  displayName: Preview release
+  type: boolean
+  default: false
+
+- name: useCustomTag
+  displayName: Use custom tag
+  type: boolean
+  default: false
+
+- name: customTag
+  displayName: Custom release tag (e.g. v6.0.XYY-source-build)
+  type: string
+  default: ' '
+
+- name: useSpecificPipelineRunIDs
+  displayName: Use specific pipeline run IDs
+  type: boolean
+  default: false
+
+- name: dotnetDotnetRunID
+  displayName: '[⚠️ 8.0] Specific dotnet-dotnet run name'
+  type: string
+  default: 202XXXXX.Y
+
+- name: dotnetInstallerOfficialRunID
+  displayName: '[⚠️ 6.0 / 7.0] Specific dotnet-installer-official-ci run name'
+  type: string
+  default: 202XXXXX.Y
+
+- name: dotnetInstallerTarballBuildRunID
+  displayName: '[⚠️ 6.0 / 7.0] Specific dotnet-installer-source-build-tarball-build run name'
+  type: string
+  default: 202XXXXX.Y
+
+- name: verifyBuildSuccess
+  displayName: Verify that associated pipeline runs succeeded
+  type: boolean
+  default: true
+
+- name: createReleaseAnnouncement
+  displayName: Create release announcement
+  type: boolean
+  default: true
+
+- name: announcementGist
+  displayName: Release announcement gist URL
+  type: string
+  default: ' '
+
+- name: submitReleasePR
+  displayName: Submit release PR
+  type: boolean
+  default: true
+
+- name: createGitHubRelease
+  displayName: '[⚠️ 8.0] Create tag & release in dotnet/dotnet'
+  type: string
+  default: auto
+  values:
+  - auto
+  - skip
+  - draft
+  - full
+
+- name: skipPackageMirroring
+  displayName: Skip package mirroring
+  type: boolean
+  default: false
+
+- name: isDryRun
+  displayName: Dry run
+  type: boolean
+  default: false
+
 trigger: none
+
 pr: none
 
 resources:
@@ -16,82 +117,12 @@ resources:
 
 pool:
   name: NetCore1ESPool-Svc-Internal
-  demands: ImageOverride -equals 1es-ubuntu-2004
-
-parameters:
-- name: dotnetMajorVersion
-  displayName: Major .NET version being released
-  type: string
-  values: [ '6.0', '7.0', '8.0' ]
-- name: releaseName
-  displayName: Release name (e.g. ".NET 8.0 Preview 1")
-  type: string
-- name: releaseBranchName
-  displayName: Release branch name (e.g. release/8.0.1xx-preview1)
-  type: string
-- name: isPreviewRelease
-  displayName: Preview release
-  type: boolean
-  default: false
-- name: useCustomTag
-  displayName: Use custom tag
-  type: boolean
-  default: false
-- name: customTag
-  displayName: Custom release tag (e.g. v6.0.XYY-source-build)
-  type: string
-  default: ' '
-- name: useSpecificPipelineRunIDs
-  displayName: Use specific pipeline run IDs
-  type: boolean
-  default: false
-- name: dotnetDotnetRunID
-  displayName: '[⚠️ 8.0] Specific dotnet-dotnet run name'
-  type: string
-  default: '202XXXXX.Y'
-- name: dotnetInstallerOfficialRunID
-  displayName: '[⚠️ 6.0 / 7.0] Specific dotnet-installer-official-ci run name'
-  type: string
-  default: '202XXXXX.Y'
-- name: dotnetInstallerTarballBuildRunID
-  displayName: '[⚠️ 6.0 / 7.0] Specific dotnet-installer-source-build-tarball-build run name'
-  type: string
-  default: '202XXXXX.Y'
-- name: verifyBuildSuccess
-  displayName: Verify that associated pipeline runs succeeded
-  type: boolean
-  default: true
-- name: skipPackageMirroring
-  displayName: Skip package mirroring
-  type: boolean
-  default: false
-- name: createReleaseAnnouncement
-  displayName: Create release announcement
-  type: boolean
-  default: true
-- name: announcementGist
-  displayName: Release announcement gist URL
-  type: string
-  default: ' '
-- name: submitReleasePR
-  displayName: Submit release PR
-  type: boolean
-  default: true
-# Auto means that for dry run, we only create a draft release; full otherwise.
-- name: createGitHubRelease
-  displayName: '[⚠️ 8.0] Create tag & release in dotnet/dotnet'
-  type: string
-  values: [ 'auto', 'skip', 'draft', 'full' ]
-  default: auto
-- name: isDryRun
-  displayName: Dry run
-  type: boolean
-  default: false
+  demands:
+  - ImageOverride -equals 1es-ubuntu-2004
 
 stages:
 - template: templates/stages/pre-release.yml
   parameters:
-    dotnetStagingPipelineResource: dotnet-staging-pipeline-resource
     dotnetMajorVersion: ${{ parameters.dotnetMajorVersion }}
     isPreviewRelease: ${{ parameters.isPreviewRelease }}
     releaseBranchName: ${{ parameters.releaseBranchName }}
@@ -102,61 +133,62 @@ stages:
     dotnetInstallerTarballBuildRunID: ${{ parameters.dotnetInstallerTarballBuildRunID }}
     verifyBuildSuccess: ${{ parameters.verifyBuildSuccess }}
     useCustomTag: ${{ parameters.useCustomTag }}
-    customTag: ${{ replace(parameters.customTag, ' ', '') }}
     isDryRun: ${{ parameters.isDryRun }}
+    dotnetStagingPipelineResource: dotnet-staging-pipeline-resource
+    customTag: ${{ replace(parameters.customTag, ' ', '') }}
 
 - stage: MirrorApproval
-  ${{ if or(eq(parameters.dotnetMajorVersion, '6.0'), eq(parameters.dotnetMajorVersion, '7.0')) }}:
-    displayName: Approval - PR merged & ready for dotnet-security-partners mirroring.
-  ${{ else }}:
-    displayName: Approval - Ready for dotnet-security-partners mirroring.
-  dependsOn: PreRelease
+  displayName: Ready for dotnet-security-partners mirroring
+  dependsOn:
+  - PreRelease
   jobs:
   - deployment: MirrorApproval
-    ${{ if or(eq(parameters.dotnetMajorVersion, '6.0'), eq(parameters.dotnetMajorVersion, '7.0')) }}:
-      displayName: Confirm PR merged & ready for dotnet-security-partners mirroring
-    ${{ else }}:
-      displayName: Confirm ready for dotnet-security-partners mirroring
-    environment: Source Build Release - Mirror
+    displayName: Ready for dotnet-security-partners mirroring
     pool: server
+    environment:
+      name: Source Build Release - Mirror
 
 - template: templates/stages/mirror.yml
   parameters:
-    dotnetStagingPipelineResource: dotnet-staging-pipeline-resource
     dotnetMajorVersion: ${{ parameters.dotnetMajorVersion }}
     isPreviewRelease: ${{ parameters.isPreviewRelease }}
     releaseBranchName: ${{ parameters.releaseBranchName }}
     useCustomTag: ${{ parameters.useCustomTag }}
     skipPackageMirroring: ${{ parameters.skipPackageMirroring }}
     isDryRun: ${{ parameters.isDryRun }}
+    dotnetStagingPipelineResource: dotnet-staging-pipeline-resource
 
 - stage: NotificationApproval
-  displayName: Approval - Partner notification
-  dependsOn: Mirror
+  displayName: Confirm partner notification sent
+  dependsOn:
+  - Mirror
   jobs:
   - deployment: NotificationApproval
     displayName: Confirm partner notification sent
-    environment: Source Build Release - Partner Notification
     pool: server
+    environment:
+      name: Approval - Partner notification
 
 - stage: ReleaseApproval
-  displayName: Approval - Release
-  dependsOn: NotificationApproval
+  displayName: Confirm Microsoft build released
+  dependsOn:
+  - NotificationApproval
   jobs:
   - deployment: ReleaseApproval
     displayName: Confirm Microsoft build released
-    environment: Source Build Release - Release
     pool: server
+    environment:
+      name: Source Build Release - Release
 
 - template: templates/stages/release.yml
   parameters:
-    dotnetStagingPipelineResource: dotnet-staging-pipeline-resource
     dotnetMajorVersion: ${{ parameters.dotnetMajorVersion }}
-    releaseName: ${{ parameters.releaseName }}
-    releaseBranchName: ${{ parameters.releaseBranchName }}
     isPreviewRelease: ${{ parameters.isPreviewRelease }}
+    releaseBranchName: ${{ parameters.releaseBranchName }}
+    releaseName: ${{ parameters.releaseName }}
     createReleaseAnnouncement: ${{ parameters.createReleaseAnnouncement }}
-    announcementGist: ${{ replace(parameters.announcementGist, ' ', '') }}
     createGitHubRelease: ${{ parameters.createGitHubRelease }}
     submitReleasePR: ${{ parameters.submitReleasePR }}
     isDryRun: ${{ parameters.isDryRun }}
+    dotnetStagingPipelineResource: dotnet-staging-pipeline-resource
+    announcementGist: ${{ replace(parameters.announcementGist, ' ', '') }}
