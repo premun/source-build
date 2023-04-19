@@ -29,7 +29,7 @@ public abstract class SourceBuildReleasePipelineBase : PipelineDefinition
                 {
                     Source = "Stage-DotNet"
                 }
-            }
+            },
 
             Repositories =
             {
@@ -47,23 +47,23 @@ public abstract class SourceBuildReleasePipelineBase : PipelineDefinition
             PipelineParameters.DotnetMajorVersion,
             PipelineParameters.ReleaseName,
             PipelineParameters.ReleaseBranchName,
-            PipelineParameters.IsPreviewRelease,
+            PipelineParameters.IsPreviewRelease with { Default = false },
 
-            PipelineParameters.UseCustomTag,
-            PipelineParameters.CustomTag,
+            PipelineParameters.UseCustomTag with { Default = false },
+            PipelineParameters.CustomTag  with { Default = " " },
 
-            PipelineParameters.UseSpecificPipelineRunIDs,
-            PipelineParameters.DotnetDotnetRunID,
-            PipelineParameters.DotnetInstallerOfficialRunID,
-            PipelineParameters.DotnetInstallerTarballBuildRunID,
-            PipelineParameters.VerifyBuildSuccess,
+            PipelineParameters.UseSpecificPipelineRunIDs with { Default = false },
+            PipelineParameters.DotnetDotnetRunID with { Default = "202XXXXX.Y" },
+            PipelineParameters.DotnetInstallerOfficialRunID with { Default = "202XXXXX.Y" },
+            PipelineParameters.DotnetInstallerTarballBuildRunID with { Default = "202XXXXX.Y" },
+            PipelineParameters.VerifyBuildSuccess with { Default = true },
 
-            PipelineParameters.CreateReleaseAnnouncement,
-            PipelineParameters.AnnouncementGist,
+            PipelineParameters.CreateReleaseAnnouncement with { Default = true },
+            PipelineParameters.AnnouncementGist with { Default = " " },
 
-            PipelineParameters.SubmitReleasePR,
-            PipelineParameters.CreateGitHubRelease,
-            PipelineParameters.SkipPackageMirroring,
+            PipelineParameters.SkipPackageMirroring with { Default = false },
+            PipelineParameters.SubmitReleasePR with { Default = true },
+            PipelineParameters.CreateGitHubRelease with { Default = "auto" },
         },
 
         Stages =

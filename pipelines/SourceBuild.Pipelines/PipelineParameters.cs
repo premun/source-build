@@ -19,38 +19,38 @@ public static class PipelineParameters
     public static StringParameter ReleaseBranchName { get; } =
         new("releaseBranchName", "Release branch name (e.g. release/8.0.1xx-preview1)");
     public static BooleanParameter IsPreviewRelease { get; } =
-        new("isPreviewRelease", "Preview release", false);
+        new("isPreviewRelease", "Preview release");
 
     public static BooleanParameter UseCustomTag { get; } =
-        new("useCustomTag", "Use custom tag", false);
+        new("useCustomTag", "Use custom tag");
     public static StringParameter CustomTag { get; } =
-        new("customTag", "Custom release tag (e.g. v6.0.XYY-source-build)", " ");
+        new("customTag", "Custom release tag (e.g. v6.0.XYY-source-build)");
 
     public static BooleanParameter UseSpecificPipelineRunIDs { get; } =
-        new("useSpecificPipelineRunIDs", "Use specific pipeline run IDs", false);
+        new("useSpecificPipelineRunIDs", "Use specific pipeline run IDs");
     public static StringParameter DotnetDotnetRunID { get; } =
-        new("dotnetDotnetRunID", "[⚠️ 8.0] Specific dotnet-dotnet run name", "202XXXXX.Y");
+        new("dotnetDotnetRunID", "[⚠️ 8.0] Specific dotnet-dotnet run name");
     public static StringParameter DotnetInstallerOfficialRunID { get; } =
-        new("dotnetInstallerOfficialRunID", "[⚠️ 6.0 / 7.0] Specific dotnet-installer-official-ci run name", "202XXXXX.Y");
+        new("dotnetInstallerOfficialRunID", "[⚠️ 6.0 / 7.0] Specific dotnet-installer-official-ci run name");
     public static StringParameter DotnetInstallerTarballBuildRunID { get; } =
-        new("dotnetInstallerTarballBuildRunID", "[⚠️ 6.0 / 7.0] Specific dotnet-installer-source-build-tarball-build run name", "202XXXXX.Y");
+        new("dotnetInstallerTarballBuildRunID", "[⚠️ 6.0 / 7.0] Specific dotnet-installer-source-build-tarball-build run name");
     public static BooleanParameter VerifyBuildSuccess { get; } =
-        new("verifyBuildSuccess", "Verify that associated pipeline runs succeeded", true);
+        new("verifyBuildSuccess", "Verify that associated pipeline runs succeeded");
 
     public static BooleanParameter SkipPackageMirroring { get; } =
-        new("skipPackageMirroring", "Skip package mirroring", false);
+        new("skipPackageMirroring", "Skip package mirroring");
 
     public static BooleanParameter CreateReleaseAnnouncement { get; } =
-        new("createReleaseAnnouncement", "Create release announcement", true);
+        new("createReleaseAnnouncement", "Create release announcement");
     public static StringParameter AnnouncementGist { get; } =
-        new("announcementGist", "Release announcement gist URL", " ");
+        new("announcementGist", "Release announcement gist URL");
 
     public static BooleanParameter SubmitReleasePR { get; } =
-        new("submitReleasePR", "Submit release PR", true);
+        new("submitReleasePR", "Submit release PR");
 
     // Auto means that for dry run, we only create a draft release; full otherwise.
     public static StringParameter CreateGitHubRelease { get; } =
-        new("createGitHubRelease", "[⚠️ 8.0] Create tag & release in dotnet/dotnet", "auto", new[] { "auto", "skip", "draft", "full" });
+        new("createGitHubRelease", "[⚠️ 8.0] Create tag & release in dotnet/dotnet", allowedValues: new[] { "auto", "skip", "draft", "full" });
 
     public static BooleanParameter IsDryRun { get; } =
         new BooleanParameter("isDryRun", "Dry run");
