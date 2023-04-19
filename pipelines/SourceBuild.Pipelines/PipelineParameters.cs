@@ -8,7 +8,9 @@ namespace SourceBuild.Pipelines;
 public static class PipelineParameters
 {
     public const string StagingPipelineName = "dotnet-staging-pipeline-resource";
-    public const string StagingPipelineResource = "dotnetStagingPipelineResource";
+
+    public static StringParameter DotnetStagingPipelineResource { get; } =
+        new("dotnetStagingPipelineResource");
 
     public static StringParameter DotnetMajorVersion { get; } =
         new("dotnetMajorVersion","Major .NET version being released", allowedValues: new[] { "6.0", "7.0", "8.0" });
@@ -50,5 +52,6 @@ public static class PipelineParameters
     public static StringParameter CreateGitHubRelease { get; } =
         new("createGitHubRelease", "[⚠️ 8.0] Create tag & release in dotnet/dotnet", "auto", new[] { "auto", "skip", "draft", "full" });
 
-    public static BooleanParameter IsDryRun { get; } = new BooleanParameter("isDryRun", "Dry run");
+    public static BooleanParameter IsDryRun { get; } =
+        new BooleanParameter("isDryRun", "Dry run");
 }

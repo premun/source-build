@@ -6,7 +6,7 @@ using Sharpliner.AzureDevOps;
 
 namespace SourceBuild.Pipelines;
 
-public abstract class SourceBuildReleasePipeline : PipelineDefinition
+public abstract class SourceBuildReleasePipelineBase : PipelineDefinition
 {
     public override TargetPathType TargetPathType => TargetPathType.RelativeToGitRoot;
 
@@ -28,8 +28,8 @@ public abstract class SourceBuildReleasePipeline : PipelineDefinition
                 new PipelineResource(PipelineParameters.StagingPipelineName)
                 {
                     Source = "Stage-DotNet"
-                },
-            },
+                }
+            }
 
             Repositories =
             {
@@ -39,7 +39,7 @@ public abstract class SourceBuildReleasePipeline : PipelineDefinition
                     Name = "dotnet-dotnet",
                     Ref = "main",
                 }
-            },
+            }
         },
 
         Parameters =
@@ -84,7 +84,7 @@ public abstract class SourceBuildReleasePipeline : PipelineDefinition
                 },
                 otherParameters: new()
                 {
-                    { PipelineParameters.StagingPipelineResource, PipelineParameters.StagingPipelineName },
+                    { PipelineParameters.DotnetStagingPipelineResource.Name, PipelineParameters.StagingPipelineName },
                     { PipelineParameters.CustomTag.Name, "${{ replace(parameters.customTag, ' ', '') }}" },
                     { PipelineParameters.IsDryRun.Name, _isTestPipeline },
                 }),
@@ -106,7 +106,7 @@ public abstract class SourceBuildReleasePipeline : PipelineDefinition
                 },
                 otherParameters: new()
                 {
-                    { PipelineParameters.StagingPipelineResource, PipelineParameters.StagingPipelineName },
+                    { PipelineParameters.DotnetStagingPipelineResource.Name, PipelineParameters.StagingPipelineName },
                     { PipelineParameters.IsDryRun.Name, _isTestPipeline },
                 }),
 
@@ -135,7 +135,7 @@ public abstract class SourceBuildReleasePipeline : PipelineDefinition
                 },
                 otherParameters: new()
                 {
-                    { PipelineParameters.StagingPipelineResource, PipelineParameters.StagingPipelineName },
+                    { PipelineParameters.DotnetStagingPipelineResource.Name, PipelineParameters.StagingPipelineName },
                     { PipelineParameters.AnnouncementGist.Name, "${{ replace(parameters.announcementGist, ' ', '') }}" },
                     { PipelineParameters.IsDryRun.Name, _isTestPipeline },
                 }),
@@ -146,7 +146,7 @@ public abstract class SourceBuildReleasePipeline : PipelineDefinition
 
     private readonly bool _isTestPipeline;
 
-    protected SourceBuildReleasePipeline(bool isTestPipeline)
+    protected SourceBuildReleasePipelineBase(bool isTestPipeline)
     {
         _isTestPipeline = isTestPipeline;
     }

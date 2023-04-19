@@ -3,11 +3,11 @@
 
 namespace SourceBuild.Pipelines;
 
-public class SourceBuildReleaseTest : SourceBuildReleasePipeline
+public class SourceBuildReleaseTestPipeline : SourceBuildReleasePipelineBase
 {
     public override string TargetFile => "eng/source-build-release-test.yml";
 
-    public SourceBuildReleaseTest() : base(isTestPipeline: true)
+    public SourceBuildReleaseTestPipeline() : base(isTestPipeline: true)
     {
     }
 }
