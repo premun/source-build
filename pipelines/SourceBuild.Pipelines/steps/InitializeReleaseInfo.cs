@@ -15,6 +15,7 @@ public class InitializeReleaseInfo : StepTemplateDefinition
     public override List<Parameter> Parameters => new()
     {
         PipelineParameters.DotnetStagingPipelineResource,
+        PipelineParameters.DotnetMajorVersion,
         PipelineParameters.ReleaseBranchName,
         PipelineParameters.UseSpecificPipelineRunIDs,
         PipelineParameters.DotnetInstallerOfficialRunID with { Default = string.Empty },
