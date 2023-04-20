@@ -14,23 +14,23 @@ public class InitializeReleaseInfo : StepTemplateDefinition
 
     public override List<Parameter> Parameters => new()
     {
-        PipelineParameters.DotnetStagingPipelineResource,
-        PipelineParameters.DotnetMajorVersion,
-        PipelineParameters.ReleaseBranchName,
-        PipelineParameters.UseSpecificPipelineRunIDs,
-        PipelineParameters.DotnetInstallerOfficialRunID with { Default = string.Empty },
-        PipelineParameters.DotnetInstallerTarballBuildRunID with { Default = string.Empty },
-        PipelineParameters.DotnetDotnetRunID with { Default = string.Empty },
-        PipelineParameters.VerifyBuildSuccess,
-        PipelineParameters.UseCustomTag,
-        PipelineParameters.CustomTag,
-        PipelineParameters.IsDryRun,
+        ReleaseParameters.DotnetStagingPipelineResource,
+        ReleaseParameters.DotnetMajorVersion,
+        ReleaseParameters.ReleaseBranchName,
+        ReleaseParameters.UseSpecificPipelineRunIDs,
+        ReleaseParameters.DotnetInstallerOfficialRunID with { Default = string.Empty },
+        ReleaseParameters.DotnetInstallerTarballBuildRunID with { Default = string.Empty },
+        ReleaseParameters.DotnetDotnetRunID with { Default = string.Empty },
+        ReleaseParameters.VerifyBuildSuccess,
+        ReleaseParameters.UseCustomTag,
+        ReleaseParameters.CustomTag,
+        ReleaseParameters.IsDryRun,
     };
 
     public override ConditionedList<Step> Definition => new()
     {
         Download.FromPipelineResource(
-            parameters[PipelineParameters.DotnetStagingPipelineResource.Name],
+            parameters[ReleaseParameters.DotnetStagingPipelineResource.Name],
             "manifests",
             new[] { "manifest.json" }) with
         {
@@ -38,7 +38,7 @@ public class InitializeReleaseInfo : StepTemplateDefinition
         },
 
         Download.FromPipelineResource(
-            parameters[PipelineParameters.DotnetStagingPipelineResource.Name],
+            parameters[ReleaseParameters.DotnetStagingPipelineResource.Name],
             "drop",
             new[] { "config.json" }) with
         {

@@ -5,7 +5,7 @@ using Sharpliner.AzureDevOps;
 
 namespace SourceBuild.Pipelines;
 
-public static class PipelineParameters
+public static class ReleaseParameters
 {
     public const string StagingPipelineName = "dotnet-staging-pipeline-resource";
 

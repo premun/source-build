@@ -14,19 +14,19 @@ public class PreReleaseStage : StageTemplateDefinition
 
     public override List<Parameter> Parameters => new()
     {
-        PipelineParameters.DotnetStagingPipelineResource,
-        PipelineParameters.DotnetMajorVersion,
-        PipelineParameters.IsPreviewRelease,
-        PipelineParameters.ReleaseName,
-        PipelineParameters.ReleaseBranchName,
-        PipelineParameters.UseSpecificPipelineRunIDs,
-        PipelineParameters.DotnetInstallerOfficialRunID with { Default = string.Empty },
-        PipelineParameters.DotnetInstallerTarballBuildRunID with { Default = string.Empty },
-        PipelineParameters.DotnetDotnetRunID with { Default = string.Empty },
-        PipelineParameters.VerifyBuildSuccess,
-        PipelineParameters.UseCustomTag,
-        PipelineParameters.CustomTag,
-        PipelineParameters.IsDryRun,
+        ReleaseParameters.DotnetStagingPipelineResource,
+        ReleaseParameters.DotnetMajorVersion,
+        ReleaseParameters.IsPreviewRelease,
+        ReleaseParameters.ReleaseName,
+        ReleaseParameters.ReleaseBranchName,
+        ReleaseParameters.UseSpecificPipelineRunIDs,
+        ReleaseParameters.DotnetInstallerOfficialRunID with { Default = string.Empty },
+        ReleaseParameters.DotnetInstallerTarballBuildRunID with { Default = string.Empty },
+        ReleaseParameters.DotnetDotnetRunID with { Default = string.Empty },
+        ReleaseParameters.VerifyBuildSuccess,
+        ReleaseParameters.UseCustomTag,
+        ReleaseParameters.CustomTag,
+        ReleaseParameters.IsDryRun,
     };
 
     public override ConditionedList<Stage> Definition => new()
@@ -40,13 +40,13 @@ public class PreReleaseStage : StageTemplateDefinition
                     Variables =
                     {
                         VariableTemplate("../variables/pipelines.yml"),
-                        If.Or(Equal(parameters[PipelineParameters.DotnetMajorVersion.Name], "6.0"), Equal(parameters[PipelineParameters.DotnetMajorVersion.Name], "7.0"))
+                        If.Or(Equal(parameters[ReleaseParameters.DotnetMajorVersion.Name], "6.0"), Equal(parameters[ReleaseParameters.DotnetMajorVersion.Name], "7.0"))
                             .Group("DotNet-MSRC-Storage")
                             .Group("DotNet-Source-Build-All-Orgs-Source-Access")
                             .Variable("storageAccountName", "dotnetclimsrc")
                             .Variable("blobContainerName", "source-build")
                             .Variable("vmrUpstreamUrl", "https://dnceng@dev.azure.com/dnceng/internal/_git/security-partners-dotnet")
-                            .If.True(parameters[PipelineParameters.IsDryRun.Name])
+                            .If.True(parameters[ReleaseParameters.IsDryRun.Name])
                                     .Variable("blobContainerUploadBaseFilePath", "Dev")
                                 .Else
                                     .Variable("blobContainerUploadBaseFilePath", "release")

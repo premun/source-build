@@ -25,7 +25,7 @@ public abstract class SourceBuildReleasePipelineBase : PipelineDefinition
         {
             Pipelines =
             {
-                new PipelineResource(PipelineParameters.StagingPipelineName)
+                new PipelineResource(ReleaseParameters.StagingPipelineName)
                 {
                     Source = "Stage-DotNet"
                 }
@@ -44,26 +44,26 @@ public abstract class SourceBuildReleasePipelineBase : PipelineDefinition
 
         Parameters =
         {
-            PipelineParameters.DotnetMajorVersion,
-            PipelineParameters.ReleaseName,
-            PipelineParameters.ReleaseBranchName,
-            PipelineParameters.IsPreviewRelease with { Default = false },
+            ReleaseParameters.DotnetMajorVersion,
+            ReleaseParameters.ReleaseName,
+            ReleaseParameters.ReleaseBranchName,
+            ReleaseParameters.IsPreviewRelease with { Default = false },
 
-            PipelineParameters.UseCustomTag with { Default = false },
-            PipelineParameters.CustomTag  with { Default = " " },
+            ReleaseParameters.UseCustomTag with { Default = false },
+            ReleaseParameters.CustomTag  with { Default = " " },
 
-            PipelineParameters.UseSpecificPipelineRunIDs with { Default = false },
-            PipelineParameters.DotnetDotnetRunID with { Default = "202XXXXX.Y" },
-            PipelineParameters.DotnetInstallerOfficialRunID with { Default = "202XXXXX.Y" },
-            PipelineParameters.DotnetInstallerTarballBuildRunID with { Default = "202XXXXX.Y" },
-            PipelineParameters.VerifyBuildSuccess with { Default = true },
+            ReleaseParameters.UseSpecificPipelineRunIDs with { Default = false },
+            ReleaseParameters.DotnetDotnetRunID with { Default = "202XXXXX.Y" },
+            ReleaseParameters.DotnetInstallerOfficialRunID with { Default = "202XXXXX.Y" },
+            ReleaseParameters.DotnetInstallerTarballBuildRunID with { Default = "202XXXXX.Y" },
+            ReleaseParameters.VerifyBuildSuccess with { Default = true },
 
-            PipelineParameters.CreateReleaseAnnouncement with { Default = true },
-            PipelineParameters.AnnouncementGist with { Default = " " },
+            ReleaseParameters.CreateReleaseAnnouncement with { Default = true },
+            ReleaseParameters.AnnouncementGist with { Default = " " },
 
-            PipelineParameters.SkipPackageMirroring with { Default = false },
-            PipelineParameters.SubmitReleasePR with { Default = true },
-            PipelineParameters.CreateGitHubRelease with { Default = "auto" },
+            ReleaseParameters.SkipPackageMirroring with { Default = false },
+            ReleaseParameters.SubmitReleasePR with { Default = true },
+            ReleaseParameters.CreateGitHubRelease with { Default = "auto" },
         },
 
         Stages =
@@ -71,22 +71,22 @@ public abstract class SourceBuildReleasePipelineBase : PipelineDefinition
             StageTemplate("templates/stages/pre-release.yml",
                 passThroughParameters: new Parameter[]
                 {
-                    PipelineParameters.DotnetMajorVersion,
-                    PipelineParameters.IsPreviewRelease,
-                    PipelineParameters.ReleaseBranchName,
-                    PipelineParameters.ReleaseName,
-                    PipelineParameters.UseSpecificPipelineRunIDs,
-                    PipelineParameters.DotnetDotnetRunID,
-                    PipelineParameters.DotnetInstallerOfficialRunID,
-                    PipelineParameters.DotnetInstallerTarballBuildRunID,
-                    PipelineParameters.VerifyBuildSuccess,
-                    PipelineParameters.UseCustomTag,
+                    ReleaseParameters.DotnetMajorVersion,
+                    ReleaseParameters.IsPreviewRelease,
+                    ReleaseParameters.ReleaseBranchName,
+                    ReleaseParameters.ReleaseName,
+                    ReleaseParameters.UseSpecificPipelineRunIDs,
+                    ReleaseParameters.DotnetDotnetRunID,
+                    ReleaseParameters.DotnetInstallerOfficialRunID,
+                    ReleaseParameters.DotnetInstallerTarballBuildRunID,
+                    ReleaseParameters.VerifyBuildSuccess,
+                    ReleaseParameters.UseCustomTag,
                 },
                 otherParameters: new()
                 {
-                    { PipelineParameters.DotnetStagingPipelineResource.Name, PipelineParameters.StagingPipelineName },
-                    { PipelineParameters.CustomTag.Name, "${{ replace(parameters.customTag, ' ', '') }}" },
-                    { PipelineParameters.IsDryRun.Name, _isTestPipeline },
+                    { ReleaseParameters.DotnetStagingPipelineResource.Name, ReleaseParameters.StagingPipelineName },
+                    { ReleaseParameters.CustomTag.Name, "${{ replace(parameters.customTag, ' ', '') }}" },
+                    { ReleaseParameters.IsDryRun.Name, _isTestPipeline },
                 }),
 
             ApprovalStage(
@@ -98,16 +98,16 @@ public abstract class SourceBuildReleasePipelineBase : PipelineDefinition
             StageTemplate("templates/stages/mirror.yml",
                 passThroughParameters: new Parameter[]
                 {
-                    PipelineParameters.DotnetMajorVersion,
-                    PipelineParameters.IsPreviewRelease,
-                    PipelineParameters.ReleaseBranchName,
-                    PipelineParameters.UseCustomTag,
-                    PipelineParameters.SkipPackageMirroring,
+                    ReleaseParameters.DotnetMajorVersion,
+                    ReleaseParameters.IsPreviewRelease,
+                    ReleaseParameters.ReleaseBranchName,
+                    ReleaseParameters.UseCustomTag,
+                    ReleaseParameters.SkipPackageMirroring,
                 },
                 otherParameters: new()
                 {
-                    { PipelineParameters.DotnetStagingPipelineResource.Name, PipelineParameters.StagingPipelineName },
-                    { PipelineParameters.IsDryRun.Name, _isTestPipeline },
+                    { ReleaseParameters.DotnetStagingPipelineResource.Name, ReleaseParameters.StagingPipelineName },
+                    { ReleaseParameters.IsDryRun.Name, _isTestPipeline },
                 }),
 
             ApprovalStage(
@@ -125,19 +125,19 @@ public abstract class SourceBuildReleasePipelineBase : PipelineDefinition
             StageTemplate("templates/stages/release.yml",
                 passThroughParameters: new Parameter[]
                 {
-                    PipelineParameters.DotnetMajorVersion,
-                    PipelineParameters.IsPreviewRelease,
-                    PipelineParameters.ReleaseBranchName,
-                    PipelineParameters.ReleaseName,
-                    PipelineParameters.CreateReleaseAnnouncement,
-                    PipelineParameters.CreateGitHubRelease,
-                    PipelineParameters.SubmitReleasePR,
+                    ReleaseParameters.DotnetMajorVersion,
+                    ReleaseParameters.IsPreviewRelease,
+                    ReleaseParameters.ReleaseBranchName,
+                    ReleaseParameters.ReleaseName,
+                    ReleaseParameters.CreateReleaseAnnouncement,
+                    ReleaseParameters.CreateGitHubRelease,
+                    ReleaseParameters.SubmitReleasePR,
                 },
                 otherParameters: new()
                 {
-                    { PipelineParameters.DotnetStagingPipelineResource.Name, PipelineParameters.StagingPipelineName },
-                    { PipelineParameters.AnnouncementGist.Name, "${{ replace(parameters.announcementGist, ' ', '') }}" },
-                    { PipelineParameters.IsDryRun.Name, _isTestPipeline },
+                    { ReleaseParameters.DotnetStagingPipelineResource.Name, ReleaseParameters.StagingPipelineName },
+                    { ReleaseParameters.AnnouncementGist.Name, "${{ replace(parameters.announcementGist, ' ', '') }}" },
+                    { ReleaseParameters.IsDryRun.Name, _isTestPipeline },
                 }),
         }
     };
