@@ -55,7 +55,7 @@ public class PreReleaseStage : StageTemplateDefinition
                     Steps =
                     {
                         StepTemplate("../steps/initialize-release-info.yml",
-                            new TemplateParameters().PassThroughParameters(new Parameter[]
+                            new Parameter[]
                             {
                                 ReleaseParameters.DotnetMajorVersion,
                                 ReleaseParameters.DotnetStagingPipelineResource,
@@ -68,7 +68,7 @@ public class PreReleaseStage : StageTemplateDefinition
                                 ReleaseParameters.UseCustomTag,
                                 ReleaseParameters.CustomTag,
                                 ReleaseParameters.IsDryRun,
-                            })),
+                            }.AddParameters(new())),
 
                         Script.Inline(
                             """
@@ -86,7 +86,7 @@ public class PreReleaseStage : StageTemplateDefinition
                               --sdk-version "$(ReadReleaseInfo.SdkVersion)"              \
                               --runtime-version "$(ReadReleaseInfo.RuntimeVersion)"      \
                               --tag "$(ReadReleaseInfo.ReleaseTag)"
-                           """) with
+                            """) with
                         {
                             DisplayName = "Create announcement draft"
                         },

@@ -69,13 +69,7 @@ public abstract class SourceBuildReleasePipelineBase : PipelineDefinition
         Stages =
         {
             StageTemplate("templates/stages/pre-release.yml",
-                new TemplateParameters()
-                {
-                    { ReleaseParameters.DotnetStagingPipelineResource.Name, ReleaseParameters.StagingPipelineName },
-                    { ReleaseParameters.CustomTag.Name, Helpers.RemoveSpace(ReleaseParameters.CustomTag) },
-                    { ReleaseParameters.IsDryRun.Name, _isTestPipeline }
-                }
-                .PassThroughParameters(new Parameter[]
+                new Parameter[]
                 {
                     ReleaseParameters.DotnetMajorVersion,
                     ReleaseParameters.IsPreviewRelease,
@@ -87,49 +81,49 @@ public abstract class SourceBuildReleasePipelineBase : PipelineDefinition
                     ReleaseParameters.DotnetInstallerTarballBuildRunID,
                     ReleaseParameters.VerifyBuildSuccess,
                     ReleaseParameters.UseCustomTag,
+                }
+                .AddParameters(new()
+                {
+                    { ReleaseParameters.DotnetStagingPipelineResource.Name, ReleaseParameters.StagingPipelineName },
+                    { ReleaseParameters.CustomTag.Name, Helpers.RemoveSpace(ReleaseParameters.CustomTag) },
+                    { ReleaseParameters.IsDryRun.Name, _isTestPipeline }
                 })),
 
             ApprovalStage(
                 name: "MirrorApproval",
                 environment: "Source Build Release - Mirror",
-                dependsOn: new[] { "PreRelease" },
+                dependsOn: "PreRelease",
                 hint: "Ready for dotnet-security-partners mirroring"),
 
             StageTemplate("templates/stages/mirror.yml",
-                new TemplateParameters()
-                {
-                    { ReleaseParameters.DotnetStagingPipelineResource.Name, ReleaseParameters.StagingPipelineName },
-                    { ReleaseParameters.IsDryRun.Name, _isTestPipeline },
-                }
-                .PassThroughParameters(new Parameter[]
+                new Parameter[]
                 {
                     ReleaseParameters.DotnetMajorVersion,
                     ReleaseParameters.IsPreviewRelease,
                     ReleaseParameters.ReleaseBranchName,
                     ReleaseParameters.UseCustomTag,
                     ReleaseParameters.SkipPackageMirroring,
+                }
+                .AddParameters(new()
+                {
+                    { ReleaseParameters.DotnetStagingPipelineResource.Name, ReleaseParameters.StagingPipelineName },
+                    { ReleaseParameters.IsDryRun.Name, _isTestPipeline },
                 })),
 
             ApprovalStage(
                 name: "NotificationApproval",
                 environment: "Approval - Partner notification",
-                dependsOn: new[] { "Mirror" },
+                dependsOn: "Mirror",
                 hint: "Confirm partner notification sent"),
 
             ApprovalStage(
                 name: "ReleaseApproval",
                 environment: "Source Build Release - Release",
-                dependsOn: new[] { "NotificationApproval" },
+                dependsOn: "NotificationApproval",
                 hint: "Confirm Microsoft build released"),
 
             StageTemplate("templates/stages/release.yml",
-                new TemplateParameters()
-                {
-                    { ReleaseParameters.DotnetStagingPipelineResource.Name, ReleaseParameters.StagingPipelineName },
-                    { ReleaseParameters.AnnouncementGist.Name, Helpers.RemoveSpace(ReleaseParameters.AnnouncementGist) },
-                    { ReleaseParameters.IsDryRun.Name, _isTestPipeline },
-                }
-                .PassThroughParameters(new Parameter[]
+                new Parameter[]
                 {
                     ReleaseParameters.DotnetMajorVersion,
                     ReleaseParameters.IsPreviewRelease,
@@ -138,6 +132,12 @@ public abstract class SourceBuildReleasePipelineBase : PipelineDefinition
                     ReleaseParameters.CreateReleaseAnnouncement,
                     ReleaseParameters.CreateGitHubRelease,
                     ReleaseParameters.SubmitReleasePR,
+                }
+                .AddParameters(new()
+                {
+                    { ReleaseParameters.DotnetStagingPipelineResource.Name, ReleaseParameters.StagingPipelineName },
+                    { ReleaseParameters.AnnouncementGist.Name, Helpers.RemoveSpace(ReleaseParameters.AnnouncementGist) },
+                    { ReleaseParameters.IsDryRun.Name, _isTestPipeline },
                 })),
         }
     };
@@ -151,7 +151,7 @@ public abstract class SourceBuildReleasePipelineBase : PipelineDefinition
         _isTestPipeline = isTestPipeline;
     }
 
-    protected Stage ApprovalStage(string name, string environment, string[] dependsOn, string hint) =>
+    protected Stage ApprovalStage(string name, string environment, string dependsOn, string hint) =>
         new(name, hint)
         {
             DependsOn = dependsOn,

@@ -7,7 +7,7 @@ namespace SourceBuild.Pipelines;
 
 public static class Helpers
 {
-    public static TemplateParameters PassThroughParameters(this TemplateParameters templateParameters, Parameter[] passThroughParameters)
+    public static TemplateParameters AddParameters(this Parameter[] passThroughParameters, TemplateParameters templateParameters)
     {
         var newParameters = new TemplateParameters();
 
